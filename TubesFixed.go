@@ -1,0 +1,916 @@
+//=================================================================
+// DESKRIPSI                                                      |
+// Program ini merupakan aplikasi pendaftaran kursus online       |
+// "Kursus Koding Cepat Pintar". Program digunakan untuk          |
+// mengelola data peserta kursus, meliputi proses penambahan,     |
+// penghapusan, penampilan, pencarian, pengubahan, serta          |
+// pengurutan data peserta. Program juga dapat menampilkan        |
+// statistik jumlah peserta berdasarkan bidang minat serta        |
+// menentukan bidang minat yang paling banyak dan paling sedikit  |
+// diminati.                                                      |
+//=================================================================
+
+package main
+import "fmt"
+const NMAX = 30
+
+type Pendaftar struct {
+	IDpendaftar int
+	nama, bidangminat, Prestasi string
+	hargaKursus int
+}
+
+type tabPendaftar [NMAX]Pendaftar
+
+func main() {
+	MenuUtama()
+}
+
+
+func MenuUtama() {
+// IS : Program telah dijalankan dan belum ada menu yang dipilih oleh pengguna.
+// FS : Pengguna dapat memilih menu Input/Delete, Read, Update, atau keluar dari 
+//      program sesuai kebutuhan.
+
+	var p, counter int
+	var A tabPendaftar
+	A = tabPendaftar {
+		{1, "Budi", "Golang", "Internasional", 200000},
+		{2, "Siti", "Python", "Nasional", 600000},
+		{3, "Ahmad", "Java", "Provinsi", 1600000},
+		{4, "Dewi", "Golang", "Nasional", 300000},
+		{5, "Rizky", "Python", "Internasional", 400000},
+		{6, "Nur", "Java", "Kabupaten", 1800000},
+		{7, "Muhammad", "Golang", "Provinsi", 400000},
+		{8, "Ratna", "Python", "Kabupaten", 900000},
+		{9, "Doni", "Java", "Nasional", 1200000},
+		{10, "Rina", "Golang", "Kabupaten", 450000},
+	}
+	
+	counter = 10
+	for p != 4 {
+		fmt.Println("|================================================|")
+		fmt.Println("|               Management Center                |")
+		fmt.Println("|      Menu Utama Kursus Koding Cepat Pintar     |")
+		fmt.Println("|================================================|")
+		fmt.Println("|  1. Menu Input/Delete                          |")
+		fmt.Println("|  2. Menu Read                                  |")
+		fmt.Println("|  3. Menu Update                                |")
+		fmt.Println("|  4. Keluar                                     |")
+		fmt.Println("|================================================|")
+		fmt.Print(" Pilih Menu (1/2/3/4) : ")
+		fmt.Scan(&p)
+		fmt.Println(" ")
+
+		switch p {
+		case 1:
+			MenuInputDelete(&A, &counter)
+
+		case 2:
+			MenuRead(A, counter)
+		case 3:
+			MenuUpdate(&A, counter)
+		}
+		for p != 1 && p != 2 && p != 3 && p != 4 {
+			fmt.Print(" Error, Pilih ulang Menu (1/2/3/4) : ")
+			fmt.Scan(&p)
+		}
+		fmt.Println(" ")
+		fmt.Println(" ")
+	}
+
+}
+
+func MenuInputDelete(A *tabPendaftar, c *int) {
+// IS : Array data peserta A dan jumlah data c telah tersedia.
+// FS : Pengguna dapat menambahkan data peserta baru atau menghapus data peserta berdasarkan ID.
+
+	var sp, dataH int
+	var pilih string
+	
+	for pilih != "Ya" {
+		fmt.Println("|================================================|")
+		fmt.Println("|               Menu Input/Delete                |")
+		fmt.Println("|================================================|")
+		fmt.Println("|  1. Masukan data Peserta                       |")
+		fmt.Println("|  2. Hapus data Peserta                         |")
+		fmt.Println("|________________________________________________|")
+
+		for sp != 1 && sp != 2 {
+			fmt.Print(" Pilih Operasi (1/2) : ")
+			fmt.Scan(&sp)
+			if sp == 1 {
+				fmt.Println("|================================================================|")
+				fmt.Println("|                      Ketentuan Input                           |")
+				fmt.Println("|================================================================|")
+				fmt.Println("| Bidang Minat tersedia : Golang, Python, Java                   |")
+				fmt.Println("| Jenis Prestasi : Kabupaten, Provinsi, Nasional, Internasional  |")
+				fmt.Println("| Jika tidak ada Prestasi ketik :  -                             |")
+				fmt.Println("| Untuk berhenti Input Ketik : STOP/Stop/stop                    |")
+				fmt.Println("|________________________________________________________________|")
+				fmt.Println(" Data yang dimasukan : ")
+				inputData(A, c)
+			
+			} else if sp == 2 {
+				fmt.Println("Data akan dicari dan dihapus berdasarkan ID")
+				fmt.Println("Masukan ID dari data yang ingin dihapus :")
+				fmt.Scan(&dataH)
+				hapusData(A, c, dataH)
+			} else {
+				fmt.Print(" ERROR, pilih operasi lagi! ")
+			}
+		}
+		sp = 0
+		fmt.Print("Kembali ke Menu Utama? (Ya/Tidak) : ")
+		fmt.Scan(&pilih)
+		for pilih != "Ya" && pilih != "Tidak" {
+			fmt.Print("Error, pilih ulang opsi-nya (Ya/Tidak) : ")
+			fmt.Scan(&pilih)
+		}
+		fmt.Println(" ")
+		fmt.Println(" ")
+	}
+}
+
+
+func inputData(A *tabPendaftar, C *int) {
+// IS : Array A berisi sejumlah data peserta sebanyak C atau masih kosong.
+// FS : Data peserta baru berhasil, disimpan ke dalam array,biaya kursus ditentukan berdasarkan bidang minat,
+//      diskon diterapkan jika peserta memiliki prestasi,dan jumlah data peserta diperbarui.
+
+	var i, ID int
+	var nama string
+	var tempinvalid Pendaftar
+	
+	ID = *C
+	i = *C
+	fmt.Scan(&nama)
+	for nama != "STOP" && nama != "Stop" && nama != "stop" {
+		if i < NMAX {
+			ID = ID + 1
+			A[i].IDpendaftar = ID
+			A[i].nama = nama
+			fmt.Scan(&A[i].bidangminat, &A[i].Prestasi)
+		
+			for A[i].bidangminat != "Golang" && A[i].bidangminat != "Python" && A[i].bidangminat != "Java"{
+				fmt.Print("Bidang Minat tidak tersedia, Masukan bidang minat baru : ")
+				fmt.Scan(&A[i].bidangminat)
+			}
+			if A[i].bidangminat == "Golang" {
+				A[i].hargaKursus = 500000
+			} else if A[i].bidangminat == "Python" {
+				A[i].hargaKursus = 1000000
+			} else if A[i].bidangminat == "Java" {
+				A[i].hargaKursus = 2000000
+			} 
+			if A[i].Prestasi == "Kabupaten" || A[i].Prestasi == "Provinsi" || A[i].Prestasi == "Nasional" || A[i].Prestasi == "Internasional" {
+				DiskonKursus(A, i)
+			} else {
+				A[i].Prestasi = "Tidak Ada"
+			}
+			i++
+			fmt.Scan(&nama)
+		} else if i == NMAX {
+			fmt.Scan(&tempinvalid.bidangminat, &tempinvalid.Prestasi)
+			fmt.Println("Data penuh! Tidak bisa menambah data.")
+			fmt.Println()
+			nama = "STOP"
+			
+		}
+		
+	}
+	*C = i	
+		
+}
+
+
+func DiskonKursus(A *tabPendaftar, i int) {
+// IS : Data peserta pada indeks i telah memiliki prestasi dan biaya kursus awal.
+// FS : Biaya kursus peserta pada indeks i telah dikurangi sesuai besar diskon berdasarkan tingkat prestasi.
+
+	var HargaDiskon float64
+	if A[i].Prestasi == "Kabupaten" {
+		HargaDiskon = float64(A[i].hargaKursus) * 0.10
+		A[i].hargaKursus = A[i].hargaKursus - int(HargaDiskon)
+	} else if A[i].Prestasi == "Provinsi" {
+		HargaDiskon = float64(A[i].hargaKursus) * 0.20
+		A[i].hargaKursus = A[i].hargaKursus - int(HargaDiskon)
+	} else if A[i].Prestasi == "Nasional" {
+		HargaDiskon = float64(A[i].hargaKursus) * 0.40
+		A[i].hargaKursus = A[i].hargaKursus - int(HargaDiskon)
+	} else if A[i].Prestasi == "Internasional" {
+		HargaDiskon = float64(A[i].hargaKursus) * 0.60
+		A[i].hargaKursus = A[i].hargaKursus - int(HargaDiskon)
+	}
+
+}
+
+
+func hapusData(A *tabPendaftar, C *int, D int) {
+// IS : Array A berisi C data peserta dan ID peserta yang akan
+//      dihapus telah diketahui.
+// FS : Jika ID ditemukan maka data peserta dihapus dari array, data setelahnya digeser ke depan, dan jumlah data
+//      peserta berkurang satu. Jika tidak ditemukan maka data tetap.
+
+	var i, iH int
+	var temp Pendaftar
+	i = 0 
+	iH = -1
+	for i < *C {
+		if A[i].IDpendaftar == D {
+			iH = i
+			temp = A[iH]
+		}
+		i++
+	}
+	if iH != -1 {
+		for i = iH; i < *C-1; i++ {
+			A[i] = A[i+1]
+		}
+		*C = *C - 1
+		fmt.Printf("Data berhasil dihapus! Data yang dihapus : %.3d %s %s %s \n", temp.IDpendaftar, temp.nama, temp.bidangminat, temp.Prestasi)
+	} else {
+		fmt.Println("Data tidak ditemukan, penghapusan data gagal!")
+	}
+}
+
+
+func MenuRead(A tabPendaftar, n int) {
+// IS : Data peserta telah tersimpan di dalam array A sebanyak n data.
+// FS : Pengguna dapat memilih untuk mencetak seluruh data peserta atau melakukan pencarian data peserta.
+
+	var sp int
+	var pilih string
+	
+	for pilih != "Ya" {
+		fmt.Println("|================================================|")
+		fmt.Println("|                   Menu Read                    |")
+		fmt.Println("|================================================|")
+		fmt.Println("|  1. Cetak data Peserta                         |")
+		fmt.Println("|  2. Cari data Peserta                          |")
+		fmt.Println("|________________________________________________|")
+
+		for sp != 1 && sp != 2 {
+			fmt.Print("Pilih Operasi (1/2) : ")
+			fmt.Scan(&sp)
+			if sp == 1 {
+			cetakdata(A, n)
+			} else if sp == 2 {
+			menuCariData(A, n)
+			} else {
+				fmt.Print(" ERROR, pilih operasi lagi! ")
+			}
+		}
+		sp = 0
+		fmt.Print("Kembali ke Menu Utama? (Ya/Tidak) : ")
+		fmt.Scan(&pilih)
+		for pilih != "Ya" && pilih != "Tidak" {
+			fmt.Print("Error, pilih ulang opsi-nya (Ya/Tidak) : ")
+			fmt.Scan(&pilih)
+		}
+		fmt.Println(" ")
+	}
+}
+
+
+func cetakdata(A tabPendaftar, n int) {
+// IS : Array A berisi n data peserta.
+// FS : Seluruh data peserta beserta jumlah peserta dan statistik bidang minat ditampilkan ke layar.
+
+	var i int
+	fmt.Println(" ")
+	fmt.Println("|========================================================================================================|")
+	fmt.Printf("|  %-7s |  %-21s |  %-17s |  %-23s |  %-16s  |\n", "ID", "       Nama", "  Bidang Minat", "   Prestasi Lomba", " Biaya Kursus")
+	fmt.Println("|--------------------------------------------------------------------------------------------------------|")
+	for i = 0; i < n; i++ {
+		fmt.Printf("|  %-7.3d |  %-21s |  %-17s |  %-23s |  Rp %-13d  |\n", A[i].IDpendaftar, A[i].nama, A[i].bidangminat, A[i].Prestasi, A[i].hargaKursus)
+	}
+	fmt.Println("|--------------------------------------------------------------------------------------------------------|")
+	fmt.Printf("| Total Peserta                 : %-70d |\n", n)
+	fmt.Printf("| Total Bidang Minat            : %-70d |\n", 3)
+	statistikaBidangMinat(A, n)
+}
+
+
+func statistikaBidangMinat(A tabPendaftar, n int) {
+// IS : Array A berisi n data peserta yang telah memiliki bidang minat masing-masing.
+// FS : Ditampilkan jumlah peserta pada setiap bidang minat,bidang minat yang paling banyak diminati,
+//      serta bidang minat yang paling sedikit diminati.
+
+	var i, a, b, c, idxmax, idxmin  int
+	var min3, min1, min2, max3, max1, max2 string
+	a = 0
+	b = 0
+	c = 0
+	for i = 0; i < n; i++ {
+		if A[i].bidangminat == "Golang" {
+			a = a + 1
+		}else if A[i].bidangminat == "Python" {
+			b = b + 1
+		}else if A[i].bidangminat == "Java" {
+			c = c + 1
+		}
+	}
+
+	if a > b && a > c {
+		max3 = "Golang"
+	}else if b > a && b > c {
+		max3 = "Python"
+	}else if c > a && c > b {
+		max3 = "Java"
+	}
+
+	if a < b && a < c {
+		min3 = "Golang"
+	}else if b < a && b < c {
+		min3 = "Python"
+	}else if c < a && c < b {
+		min3 = "Java"
+	}
+
+	if a == b && a > c {
+		max1 = "Golang"
+		max2 = "Python"
+	}else if a == c && a > b {
+		max1 = "Golang"
+		max2 = "Java"
+	}else if b == c && b > a {
+		max1 = "Python"
+		max2 = "Java"
+	}
+
+	if a == b && a < c {
+		max3 = "Java" 
+		min1 = "Golang"
+		min2 = "Python"
+	}else if a == c && a < b {
+		max3 = "Python" 
+		min1 = "Golang"
+		min2 = "Java"
+	}else if b == c && b < a {
+		max3 = "Golang" 
+		min1 = "Python"
+		min2 = "Java"
+	}
+
+	if a == b && a == c {
+		max3 = "Golang"
+		max1 = "Python"
+		max2 = "Java"
+	}
+
+	fmt.Printf("| Jumlah Peserta Golang         : %-70d |\n", a)
+	fmt.Printf("| Jumlah Peserta Python         : %-70d |\n", b)
+	fmt.Printf("| Jumlah Peserta Java           : %-70d |\n", c)
+
+	if a == b && a == c {
+		fmt.Printf("| Bidang Minat Terfavorit       : %-2s %-2s %-56s |\n", max3,max1,max2)
+	}else if max1 != "" {
+		fmt.Printf("| Bidang Minat Terfavorit       : %-2s %-63s |\n", max1,max2)
+		fmt.Printf("| Bidang Minat Jarang Diminati  : %-70s |\n", min3)
+	}else {
+		fmt.Printf("| Bidang Minat Terfavorit       : %-70s |\n", max3)
+
+		if min1 != "" {
+			fmt.Printf("| Bidang Minat Jarang Diminati  : %-2s %-63s |\n", min1,min2)
+		}else {
+			fmt.Printf("| Bidang Minat Jarang Diminati  : %-70s |\n", min3)
+		}
+	}
+	
+	idxmax = 0
+	idxmin = 0
+	for i = 0 ; i < n;i++{
+		if A[i].hargaKursus < A[idxmin].hargaKursus {
+			idxmin = i
+		}
+		if A[i].hargaKursus > A[idxmax].hargaKursus {
+			idxmax = i
+		}
+	}
+	fmt.Printf("| Harga Tertinggi               : Rp %-67d |\n",A[idxmax].hargaKursus)
+	fmt.Printf("| Harga Terendah                : Rp %-67d |\n",A[idxmin].hargaKursus)
+	fmt.Println("|========================================================================================================|")
+}
+
+
+func menuCariData(A tabPendaftar, N int) {
+// IS : Array A berisi data peserta sebanyak N.
+// FS : Pengguna dapat memilih kriteria pencarian data berdasarkan ID, nama, bidang minat,
+//      biaya kursus,atau prestasi, kemudian hasil pencarian ditampilkan.
+
+	var milih, idx, Biaya, id int
+	var X string
+	fmt.Println("--------------------------------------------------")
+	fmt.Println("|               Management Center                |")
+	fmt.Println("|---------- Menu cari Data Berdasarkan ----------|")
+	fmt.Println("|------------------------------------------------|")
+	fmt.Println("|  1. ID                                         |")
+	fmt.Println("|  2. Nama                                       |")
+	fmt.Println("|  3. Bidang Minat                               |")
+	fmt.Println("|  4. Biaya Kursus                               |")
+	fmt.Println("|  5. Prestasi                                   |")
+	fmt.Println("|------------------------------------------------|")
+	fmt.Println("|------------------------------------------------|")
+	
+	for milih != 1 && milih != 2 && milih != 3 && milih != 4 && milih != 5 {
+	fmt.Print(" Pilih Menu (1/2/3/4/5): ")
+	fmt.Scan(&milih)
+	switch milih {
+		case 1:
+			fmt.Print("Masukan ID Yang di Cari : ")
+			fmt.Scan(&id)
+			fmt.Println("--------------------------------------------------")
+			sortbinary(&A, N)
+			idx = cariID(A, N, id)
+			if idx == -1 {
+			fmt.Println("Data tidak ditemukan")
+			} else {
+			fmt.Printf("%.3d %s %s %s %d\n", A[idx].IDpendaftar, A[idx].nama, A[idx].bidangminat, A[idx].Prestasi, A[idx].hargaKursus)
+			}
+			fmt.Println("--------------------------------------------------")
+		case 2:
+			fmt.Print("Masukan Nama Yang di Cari : ")
+			fmt.Scan(&X)
+			fmt.Println("--------------------------------------------------")
+			cariNama(A, N, X)
+			fmt.Println("--------------------------------------------------")
+		case 3:
+			fmt.Print("Masukan Bidang Minat Yang di Cari : ")
+			fmt.Scan(&X)
+			fmt.Println("--------------------------------------------------")
+			cariBidangMinat(A, N, X)
+			fmt.Println("--------------------------------------------------")
+		case 4:
+			fmt.Print("Masukan Biaya Kursus Yang di Cari : ")
+			fmt.Scan(&Biaya)
+			fmt.Println("--------------------------------------------------")
+			cariBiayaKursus(A, N, Biaya)
+			fmt.Println("--------------------------------------------------")
+		case 5:
+			fmt.Print("Masukan Prestasi Yang di Cari : ")
+			fmt.Scan(&X)
+			fmt.Println("--------------------------------------------------")
+			cariprestasi(A, N, X)
+			fmt.Println("--------------------------------------------------")
+		default :
+			fmt.Print(" ERROR, pilih operasi lagi! ")
+		}
+	}
+	fmt.Println(" ")
+}
+
+
+func cariID(A tabPendaftar, N int, X int) int {
+// IS : Array A telah terurut secara ascending berdasarkan ID peserta dan ID yang dicari telah diketahui.
+// FS : Mengembalikan indeks data jika ID ditemukan,atau -1 jika data tidak ditemukan.
+
+	var kanan, kiri, tengah int
+	var ketemu int
+	kiri = 0
+	kanan = N - 1
+	ketemu = -1
+	
+	for kiri <= kanan && ketemu != X {
+		tengah = (kiri + kanan) / 2
+		if X > A[tengah].IDpendaftar {
+			kiri = tengah + 1
+		} else if X < A[tengah].IDpendaftar {
+			kanan = tengah - 1
+		} else {
+			ketemu = A[tengah].IDpendaftar
+			
+		}
+
+	}
+	if ketemu == -1 {
+		tengah = -1
+	}
+	return tengah
+}
+
+
+func sortbinary(A *tabPendaftar, N int) {
+// IS : Array A berisi N data peserta yang belum tentu terurut berdasarkan ID.
+// FS : Array A terurut secara ascending berdasarkan ID peserta sehingga dapat dilakukan Binary Search.
+
+	var i, pass, idx int
+	var temp Pendaftar
+
+	pass = 1
+	for pass <= N-1 {
+		idx = pass - 1
+		i = pass
+		for i <= N-1 {
+			if A[i].IDpendaftar < A[idx].IDpendaftar {
+				idx = i
+			} else if A[i].IDpendaftar == A[idx].IDpendaftar {
+				idx = idx
+			}
+			i++
+		}
+		temp = A[pass-1]
+		A[pass-1] = A[idx]
+		A[idx] = temp
+		pass++
+	}
+}
+
+
+func cariNama(A tabPendaftar, n int, x string) {
+// IS : Array A berisi n data peserta dan nama yang akan dicari telah diketahui.
+// FS : Seluruh data peserta yang memiliki nama sesuai ditampilkan. Jika tidak ada, ditampilkan pesan bahwa data tidak ditemukan.
+
+	var i int
+	var ketemu bool
+	ketemu = false
+	fmt.Println("Data hasil pencarian Nama:")
+	for i = 0; i < n; i++ {
+		if A[i].nama == x {
+			fmt.Printf( "%.3d %s %s %s %d \n",A[i].IDpendaftar, A[i].nama, A[i].bidangminat, A[i].Prestasi, A[i].hargaKursus)
+			ketemu = true
+		}
+	}
+
+	if ketemu == false {
+		fmt.Println("Data tidak ditemukan")
+	}
+}
+
+
+func cariBidangMinat(A tabPendaftar, n int, x string) {
+// IS : Array A berisi n data peserta dan bidang minat yang akan dicari telah diketahui.
+// FS : Seluruh data peserta dengan bidang minat yang sesuai ditampilkan. Jika tidak ditemukan, 
+//      ditampilkan pesan bahwa data tidak ditemukan.
+
+	var i int
+	var ketemu bool
+	ketemu = false
+	fmt.Println("Data hasil pencarian Bidangminat:")
+	for i = 0; i < n; i++ {
+		if A[i].bidangminat == x {
+			fmt.Printf( "%.3d %s %s %s %d \n",A[i].IDpendaftar, A[i].nama, A[i].bidangminat, A[i].Prestasi, A[i].hargaKursus)
+			ketemu = true
+		}
+	}
+
+	if ketemu == false {
+		fmt.Println("Data tidak ditemukan")
+	}
+}
+
+
+func cariBiayaKursus(A tabPendaftar, n int, x int) {
+// IS : Array A berisi n data peserta dan biaya kursus yang akan dicari telah diketahui.
+// FS : Seluruh data peserta dengan biaya kursus yang sesuai ditampilkan. Jika tidak ditemukan,
+//      ditampilkan pesan bahwa data tidak ditemukan.
+
+	var i int
+	var ketemu bool
+	ketemu = false
+	fmt.Println("Data hasil pencarian Biaya kursus:")
+	for i = 0; i < n; i++ {
+		if A[i].hargaKursus == x {
+			fmt.Printf("%.3d %s %s %s %d \n", A[i].IDpendaftar, A[i].nama, A[i].bidangminat, A[i].Prestasi, A[i].hargaKursus)
+			ketemu = true
+		}
+	}
+
+	if ketemu == false {
+		fmt.Println("Data tidak ditemukan")
+	}
+}
+
+
+func cariprestasi(A tabPendaftar, n int, x string) {
+// IS : Array A berisi n data peserta dan jenis prestasi yang akan dicari telah diketahui.
+// FS : Seluruh data peserta dengan prestasi yang sesuai ditampilkan. Jika tidak ditemukan, 
+//      ditampilkan pesan bahwa data tidak ditemukan.
+
+	var i int
+	var ketemu bool
+	ketemu = false
+	fmt.Println("Data hasil pencarian Prestasi:")
+	for i = 0; i < n; i++ {
+		if A[i].Prestasi == x {
+			fmt.Printf("%.3d %s %s %s %d \n", A[i].IDpendaftar, A[i].nama, A[i].bidangminat, A[i].Prestasi, A[i].hargaKursus)
+			ketemu = true
+		}
+	}
+
+	if ketemu == false {
+		fmt.Println("Data tidak ditemukan")
+	}
+}
+
+
+func MenuUpdate(A *tabPendaftar, N int) {
+// IS : Array A berisi n data peserta dan jenis prestasi yang akan dicari telah diketahui.
+// FS : Seluruh data peserta dengan prestasi yang sesuai ditampilkan. Jika tidak ditemukan, 
+//      ditampilkan pesan bahwa data tidak ditemukan.
+
+	var sp, dataU int
+	var pilih string
+	
+	for pilih != "Ya" {
+		fmt.Println("|================================================|")
+		fmt.Println("|                  Menu Update                   |")
+		fmt.Println("|================================================|")
+		fmt.Println("|  1. Ubah data Peserta                          |")
+		fmt.Println("|  2. Sorting data Peserta                       |")
+		fmt.Println("|________________________________________________|")
+		
+		for sp != 1 && sp != 2 {
+			fmt.Print(" Pilih Operasi (1/2) : ")
+			fmt.Scan(&sp)
+			if sp == 1 {
+				fmt.Println("Data akan dicari dan diubah berdasarkan ID")
+				fmt.Print("Masukan ID dari data yang ingin diubah : ")
+				fmt.Scan(&dataU)
+				UbahData(A, N, dataU)
+			} else if sp == 2 {
+				MenuSorting(A, N)
+			} else {
+				fmt.Print(" ERROR, pilih operasi lagi! ")
+			}
+		}
+		sp = 0
+		fmt.Print("Kembali ke Menu Utama? (Ya/Tidak) : ")
+		fmt.Scan(&pilih)
+		for pilih != "Ya" && pilih != "Tidak" {
+			fmt.Print("Error, pilih ulang opsi-nya (Ya/Tidak) : ")
+			fmt.Scan(&pilih)
+		}
+		fmt.Println(" ")
+	}
+}
+
+
+func UbahData(A *tabPendaftar, N int, D int) {
+// IS : Array A berisi N data peserta dan ID peserta yang akan diubah telah diketahui.
+// FS : Jika ID ditemukan maka data peserta diperbarui sesuai input pengguna. Jika ID tidak ditemukan maka data tetap
+//      dan ditampilkan pesan bahwa data tidak ditemukan.
+
+	var i, iH int
+	var IDlama,IDbaru  int
+	var ketemu,clearID, duplikat bool
+	i = 0
+	iH = -1
+	ketemu = false
+	for i < N && ketemu == false {
+		if A[i].IDpendaftar == D {
+			iH = i
+			ketemu = true
+			fmt.Printf("Data yang akan diubah : %.3d %s %s %s\n", A[iH].IDpendaftar, A[iH].nama, A[iH].bidangminat, A[iH].Prestasi)
+			IDlama = A[iH].IDpendaftar
+			fmt.Println()
+			fmt.Println("|================================================================|")
+			fmt.Println("|                      Ketentuan Input                           |")
+			fmt.Println("|================================================================|")
+			fmt.Println("| Bidang Minat tersedia : Golang, Python, Java                   |")
+			fmt.Println("| Jenis Prestasi : Kabupaten, Provinsi, Nasional, Internasional  |")
+			fmt.Println("| Jika tidak ada Prestasi ketik :  -                             |")
+			fmt.Println("|________________________________________________________________|")
+			fmt.Println("Format Pengubahan :ID Nama BidangMinat Prestasi")
+			fmt.Print("Masukkan ID Baru (1,2,3...200): ")
+			fmt.Scan(&IDbaru)
+			clearID = false
+			for !clearID {
+				if IDbaru == IDlama {
+					A[iH].IDpendaftar = IDbaru
+					clearID = true
+				} else {
+					duplikat = cekID(*A, N, IDbaru)
+
+					if duplikat {
+						fmt.Print("ID sudah digunakan! Masukkan ID lain : ")
+						fmt.Scan(&IDbaru)
+					} else {
+						A[iH].IDpendaftar = IDbaru
+						clearID = true
+					}
+				}
+			}
+			fmt.Print("Masukkan Nama Baru : ")
+			fmt.Scan(&A[iH].nama)
+			
+			fmt.Print("Masukkan Bidang Minat Baru : ")
+			fmt.Scan(&A[iH].bidangminat)
+
+			for A[iH].bidangminat != "Golang" && A[iH].bidangminat != "Python" && A[iH].bidangminat != "Java" {
+				fmt.Print("Bidang Minat tidak tersedia, masukkan lagi : ")
+				fmt.Scan(&A[iH].bidangminat)
+			}
+
+			fmt.Print("Masukkan Prestasi Baru : ")
+			fmt.Scan(&A[iH].Prestasi)
+
+			if A[iH].bidangminat == "Golang" {
+				A[iH].hargaKursus = 500000
+			} else if A[iH].bidangminat == "Python" {
+				A[iH].hargaKursus = 1000000
+			} else if A[iH].bidangminat == "Java" {
+				A[iH].hargaKursus = 2000000
+			}
+
+			if A[iH].Prestasi == "Kabupaten" || A[iH].Prestasi == "Provinsi" || A[iH].Prestasi == "Nasional" || A[iH].Prestasi == "Internasional" {
+				DiskonKursus(A, iH)
+			} else {
+				A[iH].Prestasi = "Tidak Ada"
+			}
+		}
+		i++
+	}
+
+	if iH == -1 {
+		fmt.Println("Data yang ingin diubah tidak ditemukan")
+	} else {
+		fmt.Print("Data berhasil diubah! Data baru : ")
+		fmt.Println(A[iH].IDpendaftar, A[iH].nama, A[iH].bidangminat, A[iH].Prestasi)
+	}
+}
+
+func cekID(A tabPendaftar, n int, id int) bool {
+	var i int
+
+	for i = 0; i < n; i++ {
+		if A[i].IDpendaftar == id {
+			return true
+		}
+	}
+	return false
+}
+
+func MenuSorting(A *tabPendaftar, N int) {
+// IS : Array A berisi N data peserta yang belum tentu terurut.
+// FS : Pengguna dapat memilih metode pengurutan berdasarkan
+//      ID peserta atau biaya kursus beserta urutan ascending maupun descending.
+
+	var sp, js int
+
+	fmt.Println()
+	fmt.Println("|================================================|")
+	fmt.Println("|                  Menu Sorting                  |")
+	fmt.Println("|================================================|")
+	fmt.Println("|  1. Sort berdasarkan ID Peserta                |")
+	fmt.Println("|  2. Sort berdasarkan Biaya Kursus              |")
+	fmt.Println("|________________________________________________|")
+		
+	for sp != 1 && sp != 2 {
+		fmt.Print(" Pilih Operasi (1/2) : ")
+		fmt.Scan(&sp)
+		if sp == 1 {
+			fmt.Println(" ________________________________________________ ")
+			fmt.Println("|  1. Sorting secara Ascending                   |")
+			fmt.Println("|  2. Sorting secara Descending                  |")
+			fmt.Println("|________________________________________________|")
+			fmt.Print(" Pilih Jenis Sorting (1/2) : ")
+			fmt.Scan(&js)
+			fmt.Println(" ")
+			fmt.Println(" ")
+			sortSel(A, N, js)
+		} else if sp == 2 {
+			fmt.Println(" ________________________________________________ ")
+			fmt.Println("|  1. Sorting secara Ascending                   |")
+			fmt.Println("|  2. Sorting secara Descending                  |")
+			fmt.Println("|________________________________________________|")
+			fmt.Print(" Pilih Jenis Sorting (1/2) : ")
+			fmt.Scan(&js)
+			fmt.Println(" ")
+			fmt.Println(" ")
+				sortIn(A, N, js)
+		} else {
+			fmt.Print(" ERROR, pilih operasi lagi! ")
+		}
+	}
+}
+
+
+
+func sortSel(A *tabPendaftar, N int, js int) {
+// IS : Array A berisi N data peserta yang belum tentu terurut berdasarkan ID peserta dan jenis urutan 
+//      (ascending/ descending) telah dipilih.
+// FS : Array A telah terurut berdasarkan ID peserta menggunakan algoritma Selection Sort sesuai urutan yang dipilih. 
+//      Hasil pengurutan dapat ditampilkan jika pengguna memilih untuk mencetak data.
+
+	var i, pass, idx int
+	var temp Pendaftar
+	var pilih string
+
+	if js == 1 {
+		pass = 1
+		for pass <= N-1 {
+			idx = pass - 1
+			i = pass
+			for i < N {
+				if A[i].IDpendaftar < A[idx].IDpendaftar {
+					idx = i
+				}
+				i++
+			}
+			temp = A[pass-1]
+			A[pass-1] = A[idx]
+			A[idx] = temp
+			pass++
+		}
+		fmt.Println(" Apakah anda ingin mencetak hasil sorting-nya?")
+		fmt.Print(" (Ya/Tidak) : ")
+		fmt.Scan(&pilih)
+		for pilih != "Ya" && pilih != "Tidak" {
+			fmt.Print(" Error, pilih ulang opsi-nya (Ya/Tidak): ")
+			fmt.Scan(&pilih)
+		}
+		if pilih == "Ya" {
+			cetakdata(*A, N)
+		}
+	}
+	if js == 2 {
+		pass = 1
+		for pass <= N-1 {
+			idx = pass - 1
+			i = pass
+			for i < N {
+				if A[i].IDpendaftar > A[idx].IDpendaftar {
+					idx = i
+				}
+				i++
+			}
+			temp = A[pass-1]
+			A[pass-1] = A[idx]
+			A[idx] = temp
+			pass++
+		}
+
+		fmt.Println(" Apakah anda ingin mencetak hasil sorting-nya?")
+		fmt.Print(" (Ya/Tidak) : ")
+		fmt.Scan(&pilih)
+		for pilih != "Ya" && pilih != "Tidak" {
+			fmt.Print(" Error, pilih ulang opsi-nya (Ya/Tidak): ")
+			fmt.Scan(&pilih)
+		}
+		if pilih == "Ya" {
+			cetakdata(*A, N)
+		}
+
+	}
+}
+
+
+func sortIn(A *tabPendaftar, N int, js int) {
+// IS : Array A berisi N data peserta yang belum tentu terurut berdasarkan 
+//      biaya kursus dan jenis urutan (ascending/ descending) telah dipilih.
+// FS : Array A telah terurut berdasarkan biaya kursus menggunakan
+//      algoritma Insertion Sort sesuai urutan yang dipilih.
+//      Hasil pengurutan dapat ditampilkan jika pengguna memilih untuk mencetak data.
+
+	var i, pass int
+	var temp Pendaftar
+	var pilih string
+
+	if js == 1 {
+		pass = 1
+		for pass <= N-1 {
+			i = pass
+			temp = A[pass]
+			for i > 0 && temp.hargaKursus < A[i-1].hargaKursus {
+				A[i] = A[i-1]
+				i--
+			}
+			A[i] = temp
+			pass++
+		}
+		fmt.Println(" Apakah anda ingin mencetak hasil sorting-nya?")
+		fmt.Print(" (Ya/Tidak) : ")
+		fmt.Scan(&pilih)
+		for pilih != "Ya" && pilih != "Tidak" {
+			fmt.Print(" Error, pilih ulang opsi-nya (Ya/Tidak): ")
+			fmt.Scan(&pilih)
+		}
+		if pilih == "Ya" {
+			cetakdata(*A, N)
+		}
+	}
+	if js == 2 {
+		pass = 1
+		for pass <= N-1 {
+			i = pass
+			temp = A[pass]
+			for i > 0 && temp.hargaKursus > A[i-1].hargaKursus {
+				A[i] = A[i-1]
+				i--
+			}
+			A[i] = temp
+			pass++
+		}
+		fmt.Println(" Apakah anda ingin mencetak hasil sorting-nya?")
+		fmt.Print(" (Ya/Tidak) : ")
+		fmt.Scan(&pilih)
+		for pilih != "Ya" && pilih != "Tidak" {
+			fmt.Print(" Error, pilih ulang opsi-nya (Ya/Tidak): ")
+			fmt.Scan(&pilih)
+		}
+		if pilih == "Ya" {
+			cetakdata(*A, N)
+		}
+	}
+}
