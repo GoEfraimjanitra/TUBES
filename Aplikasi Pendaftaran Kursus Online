@@ -12,7 +12,7 @@
 
 package main
 import "fmt"
-const NMAX = 30
+const NMAX = 200
 
 type Pendaftar struct {
 	IDpendaftar int
